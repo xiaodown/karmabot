@@ -45,7 +45,7 @@
 5. **Invite the bot to your server:**
     - In the Developer Portal, go to the "OAuth2" > "URL Generator".
     - Under "Scopes", select `bot`.
-    - Under "Bot Permissions", select the permissions your bot needs (at minimum: `Read Messages`, `Send Messages`, `Read Message History`).
+    - Under "Bot Permissions", select the permissions your bot needs (at minimum: `Send Messages` and `Read Message History`).
     - Copy the generated URL, open it in your browser, and invite the bot to your server.  
       **Note:** You must be a server admin to invite bots.
 
