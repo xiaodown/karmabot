@@ -29,33 +29,40 @@ async def on_message(message):
         return
 
     for mentioned_user in message.mentions:
-        # Prevent self-karma
-        if mentioned_user.id == message.author.id:
-            karma_farmer = User.from_message(message)
-            await message.channel.send(f"You have {karma_farmer.get_karma()} karma.")
-            await message.channel.send("_Buzzkill Mode™ has prevented self-karma._")
-            continue
+        user = User(mentioned_user)
 
-        mention_str = f"<@{mentioned_user.id}>"
+        mention_str = f"<@{user.id}>"
         # Discord also supports <@!id> for nicknames
-        alt_mention_str = f"<@!{mentioned_user.id}>"
+        alt_mention_str = f"<@!{user.id}>"
 
         # Karma query pattern
-        pattern_query = (
+        karma_query_pattern = (
             rf"({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*karma\b"
         )
         # Karma adjustment pattern
-        pattern_adjust = (
+        karma_adjustment_pattern = (
             rf"({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*([+-]+)"
         )
 
-        if re.search(pattern_query, message.content, re.IGNORECASE):
-            user = User(mentioned_user)
-            karma = user.get_karma()
-            await message.channel.send(
-                f"{mentioned_user.display_name} has {karma if karma is not None else 0} karma."
-            )
-        elif match := re.search(pattern_adjust, message.content):
+        if re.search(karma_query_pattern, message.content, re.IGNORECASE):
+            karma = user.get_karma() if user.get_karma() is not None else 0
+            await message.channel.send(f"{user.display_name} has {karma} karma.")
+        elif match := re.search(karma_adjustment_pattern, message.content):
+            # Prevent self-karma
+            if user.id == message.author.id:
+                karma = user.get_karma() if user.get_karma() is not None else 0
+                await message.channel.send(f"You have {karma} karma.")
+                await message.channel.send("_Buzzkill Mode™ has prevented self-karma._")
+                continue
+
+            # Prevent karma spam
+            if not user.can_update_karma():
+                await message.channel.send(
+                    f"{user.display_name} cannot update karma yet."
+                )
+                await message.channel.send("_Buzzkill Mode™ has prevented karma spam._")
+                continue
+
             symbol_str = match.group(2)
             if all(c == "+" for c in symbol_str):
                 delta = len(symbol_str)
@@ -72,10 +79,9 @@ async def on_message(message):
                 delta = -BUZZKILL_NEGATIVE_MAX
                 buzzkill = True
 
-            user = User(mentioned_user)
             user.update_karma(delta)
             await message.channel.send(
-                f"{mentioned_user.display_name} now has {user.get_karma()} karma."
+                f"{user.display_name} now has {user.get_karma()} karma."
             )
             if buzzkill:
                 await message.channel.send(

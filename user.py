@@ -14,8 +14,9 @@ class User:
             discord_user: A discord.Member or discord.User object.
             db: Optional KarmaDatabase instance. If None, a new one is created.
         """
-        self.discord_id = discord_user.id
-        self.discord_name = discord_user.name
+        self.id = discord_user.id
+        self.name = discord_user.name
+        self.display_name = discord_user.display_name
         self.db = db if db is not None else KarmaDatabase()
 
     def exists(self) -> bool:
@@ -25,7 +26,7 @@ class User:
         Returns:
             bool: True if user exists, False otherwise.
         """
-        return self.db.read(self.discord_id) is not None
+        return self.db.read(self.id) is not None
 
     def update_karma(self, delta: int) -> None:
         """
@@ -35,8 +36,8 @@ class User:
             delta (int): The amount to change the user's karma by.
         """
         if not self.exists():
-            self.db.create(self.discord_id)
-        self.db.update(self.discord_id, delta)
+            self.db.create(self.id)
+        self.db.update(self.id, delta)
 
     def get_karma(self) -> int | None:
         """
@@ -45,7 +46,7 @@ class User:
         Returns:
             int or None: The user's karma, or None if not found.
         """
-        return self.db.read(self.discord_id)
+        return self.db.read(self.id)
 
     @classmethod
     def from_message(cls, message, db=None):
@@ -60,3 +61,12 @@ class User:
             User: The corresponding User object.
         """
         return cls(message.author, db)
+
+    def can_update_karma(self) -> bool:
+        """
+        Check if the user can update their karma based on the delay.
+
+        Returns:
+            bool: True if the user can update karma, False otherwise.
+        """
+        return self.db.can_update_karma(self.id)

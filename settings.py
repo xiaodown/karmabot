@@ -7,6 +7,7 @@ BUZZKILL_POSITIVE_MAX = 5
 # minuses will be interpreted as a markdown horizontal rule.
 # Highly recommend keeping negative buzzkill at 2 to avoid this.
 BUZZKILL_NEGATIVE_MAX = 2
+KARMA_SPAM_DELAY = 15  # seconds
 
 
 def load_api_key(api_key_file_path):
