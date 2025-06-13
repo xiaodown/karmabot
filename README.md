@@ -1,6 +1,6 @@
-# KarmaBot
+# Karmabot
 
-**KarmaBot** is a Discord bot that tracks and manages user karma in your server. Users can give or take karma from each other by mentioning users and using sequences of `+` or `-` symbols (e.g., `@user ++` or `@user --`). The bot stores karma in a local SQLite database and provides commands to check karma balances.
+**Karmabot** is a Discord bot that tracks and manages user karma in your server. Users can give or take karma from each other by mentioning users and using sequences of `+` or `-` symbols (e.g., `@user ++` or `@user --`). The bot stores karma in a local SQLite database.
 
 ---
 
@@ -8,9 +8,11 @@
 
 - Give or take karma by mentioning users and using `+` or `-`
 - Query a user's karma with `@user karma`
-- "Buzzkill mode" caps karma changes per message to prevent abuse
+- "Buzzkill mode" caps karma changes per message to prevent abuse (configurable)
+- **Spam protection:** Users can only have their karma changed once every 15 seconds (configurable)
+- **Self-karma prevention:** Users cannot give themselves karma
 - Persistent storage using SQLite
-- Clean, maintainable code (better than my average)
+- Clean, maintainable codebase (better than my average at least)
 
 ---
 
@@ -43,7 +45,7 @@
 5. **Invite the bot to your server:**
     - In the Developer Portal, go to the "OAuth2" > "URL Generator".
     - Under "Scopes", select `bot`.
-    - Under "Bot Permissions", select the permissions your bot needs (at minimum: `Send Messages` and `Read Message History`).
+    - Under "Bot Permissions", select the permissions your bot needs (at minimum: `Read Messages`, `Send Messages`, `Read Message History`).
     - Copy the generated URL, open it in your browser, and invite the bot to your server.  
       **Note:** You must be a server admin to invite bots.
 
@@ -61,7 +63,7 @@
     python ./karmabot.py
     ```
 
-The bot should now be running and listening for messages in your Discord server.
+The bot should now be running and listening for messages in your Discord server!
 
 ---
 
@@ -74,15 +76,23 @@ The bot should now be running and listening for messages in your Discord server.
 - **Check karma:**  
   `@username karma`
 
+## Abuse Prevention
+
 - **Buzzkill mode:**  
   Karma changes are capped at **+5** and **-2** per message (configurable in `settings.py`).
+
+- **Spam protection:**  
+  Users can only have their karma changed once every configurable interval (default: 15 seconds, set in `settings.py`).
+
+- **Self-karma prevention:**  
+  Users cannot give themselves karma.
 
 ---
 
 ## Notes
 
 - Make sure your bot has permission to read messages and see members in the channels you want it to operate in.
-- Due to Discord's markdown, three or more consecutive dashes (`---`) after a mention may not work as expected (interpreted as markdown for horizontal rule). Recommend keeping the BUZZKILL_NEGATIVE_MAX at 2.
+- Due to Discord's markdown, three or more consecutive dashes (`---`) after a mention may not work as expected. Use spaces or avoid triple dashes.
 
 ---
 
