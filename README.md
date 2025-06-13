@@ -92,7 +92,7 @@ The bot should now be running and listening for messages in your Discord server.
 ## Notes
 
 - Make sure your bot has permission to read messages and see members in the channels you want it to operate in.
-- Due to Discord's markdown, three or more consecutive dashes (`---`) after a mention may not work as expected. Use spaces or avoid triple dashes.
+- Due to Discord's markdown, three or more consecutive dashes (`---`) after a mention may not work as expected (interpreted as a Markdown horizontal line). Recommend keeping BUZZKILL_NEGATIVE_MAX at 2.
 
 ---
 
