@@ -1,14 +1,10 @@
 """ A Discord bot that tracks user karma in a sqlite database.
 Users can give and receive karma points by using commands."""
 
-import os
-import sqlite3
 
 import discord
 
-from db import initialize_db
-
-initialize_db()
+from db import KarmaDatabase
 
 bot = discord.Client(intents=discord.Intents.default())
 
