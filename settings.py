@@ -2,6 +2,12 @@
 
 SQLITE_DB = 'db.sqlite3'
 DISCORD_API_KEY_FILE = 'discordapikey.txt'
+BUZZKILL_POSITIVE_MAX = 5
+# NOTE: Discord has a known issuer where more than two consecutive
+# minuses will be interpreted as a markdown horizontal rule.
+# Highly recommend keeping negative buzzkill at 2 to avoid this.
+BUZZKILL_NEGATIVE_MAX = 2
+
 
 
 def load_api_key(api_key_file_path):
@@ -15,4 +21,4 @@ def load_api_key(api_key_file_path):
     except Exception as e:
         raise OSError(f"An error occurred while loading the API key: {e}") from e
 
-discord_api_key = load_api_key(DISCORD_API_KEY_FILE)
+DISCORD_API_KEY = load_api_key(DISCORD_API_KEY_FILE)
