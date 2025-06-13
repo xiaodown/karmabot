@@ -51,7 +51,7 @@ async def on_message(message):
             # Prevent self-karma
             if user.id == message.author.id:
                 karma = user.get_karma() if user.get_karma() is not None else 0
-                await message.channel.send(f"You have {karma} karma.")
+                await message.channel.send(f"{user.display_name} has {karma} karma.")
                 await message.channel.send("_Buzzkill Mode™ has prevented self-karma._")
                 continue
 
