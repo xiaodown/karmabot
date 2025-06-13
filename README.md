@@ -1,6 +1,6 @@
-# Karmabot
+# KarmaBot
 
-**Karmabot** is a Discord bot that tracks and manages user karma in your server. Users can give or take karma from each other by mentioning users and using sequences of `+` or `-` symbols (e.g., `@user ++` or `@user --`). The bot stores karma in a local SQLite database and provides commands to check karma balances.
+**KarmaBot** is a Discord bot that tracks and manages user karma in your server. Users can give or take karma from each other by mentioning users and using sequences of `+` or `-` symbols (e.g., `@user ++` or `@user --`). The bot stores karma in a local SQLite database and provides commands to check karma balances.
 
 ---
 
