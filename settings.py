@@ -1,7 +1,7 @@
 """ Settings for Karmabot """
 
 SQLITE_DB = 'db.sqlite3'
-DISCORD_API_KEY_FILE = 'discord_api_key.txt'
+DISCORD_API_KEY_FILE = 'discordapikey.txt'
 
 
 def load_api_key(api_key_file_path):

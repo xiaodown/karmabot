@@ -1,3 +1,12 @@
+# DO NOT check your discord API key into version control!
+discordapikey.txt
+
+# ALSO DO NOT check your sqlite database into version control, though it's probably not as bad.
+db.sqlite3
+
+
+#### Below is a standard Python .gitignore file ####
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
