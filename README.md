@@ -63,7 +63,7 @@
     python ./karmabot.py
     ```
 
-The bot should now be running and listening for messages in your Discord server!
+The bot should now be running and listening for messages in your Discord server.
 
 ---
 
