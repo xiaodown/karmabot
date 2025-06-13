@@ -34,12 +34,14 @@ class KarmaDatabase:
         This method ensures the database is ready for CRUD operations.
         """
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute('''
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS karma (
                     user_id INTEGER PRIMARY KEY,
                     karma INTEGER DEFAULT 0
                 )
-            ''')
+            """
+            )
 
     def create(self, user_id: int, karma: int = 0) -> None:
         """
@@ -51,8 +53,8 @@ class KarmaDatabase:
         """
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
-                'INSERT OR IGNORE INTO karma (user_id, karma) VALUES (?, ?)',
-                (user_id, karma)
+                "INSERT OR IGNORE INTO karma (user_id, karma) VALUES (?, ?)",
+                (user_id, karma),
             )
 
     def read(self, user_id: int) -> int | None:
@@ -66,10 +68,7 @@ class KarmaDatabase:
             int or None: The user's karma value, or None if the user does not exist.
         """
         with sqlite3.connect(self.db_path) as conn:
-            cur = conn.execute(
-                'SELECT karma FROM karma WHERE user_id = ?',
-                (user_id,)
-            )
+            cur = conn.execute("SELECT karma FROM karma WHERE user_id = ?", (user_id,))
             row = cur.fetchone()
             return row[0] if row else None
 
@@ -83,8 +82,7 @@ class KarmaDatabase:
         """
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
-                'UPDATE karma SET karma = karma + ? WHERE user_id = ?',
-                (delta, user_id)
+                "UPDATE karma SET karma = karma + ? WHERE user_id = ?", (delta, user_id)
             )
 
     def delete(self, user_id: int) -> None:
@@ -95,7 +93,4 @@ class KarmaDatabase:
             user_id (int): The Discord user ID to delete.
         """
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
-                'DELETE FROM karma WHERE user_id = ?',
-                (user_id,)
-            )
+            conn.execute("DELETE FROM karma WHERE user_id = ?", (user_id,))

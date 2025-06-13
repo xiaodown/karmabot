@@ -1,4 +1,4 @@
-""" A Discord bot that tracks user karma in a sqlite database.
+"""A Discord bot that tracks user karma in a sqlite database.
 Users can give and receive karma points by using commands."""
 
 import re
@@ -13,11 +13,12 @@ intents.members = True
 intents.message_content = True
 bot = discord.Client(intents=intents)
 
+
 @bot.event
 async def on_ready():
     """Event handler for when the bot is ready."""
-    print(f'Logged in as {bot.user.name} ({bot.user.id})')
-    print('------')
+    print(f"Logged in as {bot.user.name} ({bot.user.id})")
+
 
 @bot.event
 async def on_message(message):
@@ -28,14 +29,25 @@ async def on_message(message):
         return
 
     for mentioned_user in message.mentions:
-        mention_str = f'<@{mentioned_user.id}>'
+        # Prevent self-karma
+        if mentioned_user.id == message.author.id:
+            karma_farmer = User.from_message(message)
+            await message.channel.send(f"You have {karma_farmer.get_karma()} karma.")
+            await message.channel.send("_Buzzkill Mode™ has prevented self-karma._")
+            continue
+
+        mention_str = f"<@{mentioned_user.id}>"
         # Discord also supports <@!id> for nicknames
-        alt_mention_str = f'<@!{mentioned_user.id}>'
+        alt_mention_str = f"<@!{mentioned_user.id}>"
 
         # Karma query pattern
-        pattern_query = rf'({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*karma\b'
+        pattern_query = (
+            rf"({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*karma\b"
+        )
         # Karma adjustment pattern
-        pattern_adjust = rf'({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*([+-]+)'
+        pattern_adjust = (
+            rf"({re.escape(mention_str)}|{re.escape(alt_mention_str)})\s*([+-]+)"
+        )
 
         if re.search(pattern_query, message.content, re.IGNORECASE):
             user = User(mentioned_user)
@@ -45,9 +57,9 @@ async def on_message(message):
             )
         elif match := re.search(pattern_adjust, message.content):
             symbol_str = match.group(2)
-            if all(c == '+' for c in symbol_str):
+            if all(c == "+" for c in symbol_str):
                 delta = len(symbol_str)
-            elif all(c == '-' for c in symbol_str):
+            elif all(c == "-" for c in symbol_str):
                 delta = -len(symbol_str)
             else:
                 continue
@@ -69,6 +81,7 @@ async def on_message(message):
                 await message.channel.send(
                     f"_Buzzkill Mode™ has limited karma change to {delta} points._"
                 )
+
 
 if __name__ == "__main__":
     try:

@@ -2,6 +2,7 @@
 
 from db import KarmaDatabase
 
+
 class User:
     """Represents a user and provides methods to interact with the karma database."""
 
