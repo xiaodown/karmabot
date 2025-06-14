@@ -57,7 +57,7 @@ class KarmaDatabase:
                 (user_id, karma),
             )
 
-    def read(self, user_id: int) -> int | None:
+    def get_karma(self, user_id: int) -> int | None:
         """
         Retrieve the karma value for a specific user.
 

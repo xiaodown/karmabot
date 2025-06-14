@@ -28,7 +28,7 @@ class User:
         Returns:
             bool: True if user exists, False otherwise.
         """
-        return self.db.read(self.id) is not None
+        return self.db.get_karma(self.id) is not None
 
     def update_karma(self, delta: int) -> None:
         """
@@ -48,7 +48,7 @@ class User:
         Returns:
             int or None: The user's karma, or None if not found.
         """
-        return self.db.read(self.id)
+        return self.db.get_karma(self.id)
 
     @classmethod
     def from_message(cls, message, db=None):
