@@ -48,14 +48,18 @@ async def on_message(message):
                     )
                     if "top" in message.content.lower():
                         msg = "🏆 **Top Users:**\n```"
+                        i = 1
                         for user in top_users:
-                            msg += f"{user.display_name}: {user.get_karma()}\n"
+                            msg += f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            i += 1
                         msg += "```"
                         await message.channel.send(msg)
                     if "bottom" in message.content.lower():
                         msg = "💀 **Bottom Users:**\n```"
+                        i = 1
                         for user in bottom_users:
-                            msg += f"{user.display_name}: {user.get_karma()}\n"
+                            msg += f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            i += 1
                         msg += "```"
                         await message.channel.send(msg)
 
