@@ -42,14 +42,14 @@ async def bot_commands(message):
         bot_member = message.guild.me
         help_message = (
             "Karma Bot Commands:\n"
-            "- `@user +` or `@user ++` etc -    Give karma to a user"
+            "- `@user +` or `@user ++`\n    Give karma to a user"
             + f" (max of {BUZZKILL_POSITIVE_MAX}).\n"
-            "- `@user -` or `@user --` -    Remove karma from a user"
+            "- `@user -` or `@user --`\n    Remove karma from a user"
             + f" (max of {BUZZKILL_NEGATIVE_MAX}).\n"
-            "- `@user karma` -    Check a user's karma.\n"
-            f"- `@{bot_member.display_name} top` -    Show the top users by karma.\n"
-            f"- `@{bot_member.display_name} bottom` -    Show the bottom users by karma.\n"
-            f"- `@{bot_member.display_name} help` or `?` -    Show this help message.\n"
+            "- `@user karma`\n    Check a user's karma.\n"
+            f"- `@{bot_member.display_name} top`\n    Show the top users by karma.\n"
+            f"- `@{bot_member.display_name} bottom`\n    Show the bottom users by karma.\n"
+            f"- `@{bot_member.display_name} help` or `?`\n    Show this help message.\n"
         )
         await message.channel.send(help_message)
 
