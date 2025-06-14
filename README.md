@@ -79,7 +79,7 @@ The bot should now be running and listening for messages in your Discord server.
   `@username karma`
 
 - **Leaderboard:**
-  `@KarmaBot top` (to see the users with the highest karma)
+  `@KarmaBot top` (to see the users with the highest karma)  
   `@KarmaBot bottom` (to see the users with the lowest karma)
 
 ## Abuse Prevention
