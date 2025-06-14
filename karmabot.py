@@ -47,14 +47,16 @@ async def on_message(message):
                         message.guild
                     )
                     if "top" in message.content.lower():
-                        msg = "🏆 **Top Users:**\n"
+                        msg = "🏆 **Top Users:**\n```"
                         for user in top_users:
-                            msg += f"{user.display_name} — {user.get_karma()}\n"
+                            msg += f"{user.display_name}: {user.get_karma()}\n"
+                        msg += "```"
                         await message.channel.send(msg)
                     if "bottom" in message.content.lower():
-                        msg = "💀 **Bottom Users:**\n"
+                        msg = "💀 **Bottom Users:**\n```"
                         for user in bottom_users:
-                            msg += f"{user.display_name} — {user.get_karma()}\n"
+                            msg += f"{user.display_name}: {user.get_karma()}\n"
+                        msg += "```"
                         await message.channel.send(msg)
 
         mention_str = f"<@{user.id}>"

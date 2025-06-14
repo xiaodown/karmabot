@@ -11,6 +11,7 @@
 - "Buzzkill mode" caps karma changes per message to prevent abuse (configurable)
 - **Spam protection:** Users can only have their karma changed once every 15 seconds (configurable)
 - **Self-karma prevention:** Users cannot give themselves karma
+- **Leaderboard:** Users can see who has the most - and least - karma
 - Persistent storage using SQLite
 - Clean, maintainable codebase (better than my average at least)
 
@@ -28,6 +29,7 @@
     ```bash
     uv venv
     ```
+    Note: `uv` is not _required_, I just like it.  Feel free to use poetry or raw pip.
 
 3. **Install dependencies:**
     ```bash
@@ -40,7 +42,7 @@
     - Under the "Bot" settings, enable the following intents:
         - **SERVER MEMBERS INTENT**
         - **MESSAGE CONTENT INTENT**
-    - Copy your bot's token and save it in a file named `discordapikey.txt` in the project root (the file should contain only the token).
+    - Copy your bot's API token and save it in a file named `discordapikey.txt` in the project root (the file should contain only the token).
 
 5. **Invite the bot to your server:**
     - In the Developer Portal, go to the "OAuth2" > "URL Generator".
@@ -75,6 +77,10 @@ The bot should now be running and listening for messages in your Discord server.
 
 - **Check karma:**  
   `@username karma`
+
+- **Leaderboard:**
+  `@KarmaBot top` (to see the users with the highest karma)
+  `@KarmaBot bottom` (to see the users with the lowest karma)
 
 ## Abuse Prevention
 
