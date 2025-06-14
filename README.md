@@ -8,7 +8,7 @@
 
 - Give or take karma by mentioning users and using `+` or `-`
 - Query a user's karma with `@user karma`
-- "Buzzkill mode" caps karma changes per message to prevent abuse (configurable)
+- "Buzzkill Mode™" caps karma changes per message to prevent abuse (configurable)
 - **Spam protection:** Users can only have their karma changed once every 15 seconds (configurable)
 - **Self-karma prevention:** Users cannot give themselves karma
 - **Leaderboard:** Users can see who has the most - and least - karma
