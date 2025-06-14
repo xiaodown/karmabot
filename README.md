@@ -82,6 +82,9 @@ The bot should now be running and listening for messages in your Discord server.
   `@KarmaBot top` (to see the users with the highest karma)  
   `@KarmaBot bottom` (to see the users with the lowest karma)
 
+- **Help:**  
+  `@KarmaBot help` or `@KarmaBot ?` (displays help)
+
 ## Abuse Prevention
 
 - **Buzzkill mode:**  
