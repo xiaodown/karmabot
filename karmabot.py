@@ -64,7 +64,7 @@ async def bot_commands(message):
                 for user in top_users:
                     karma = user.get_karma()
                     karma_str = f"{karma:+d}" if karma != 0 else "0"
-                    msg += f"{user.display_name:<20} {karma_str:>5}\n"
+                    msg += f"{i}) {user.display_name:<20} {karma_str:>5}\n"
                     i += 1
                 msg += "```"
                 await message.channel.send(msg)
@@ -74,7 +74,7 @@ async def bot_commands(message):
                 for user in bottom_users:
                     karma = user.get_karma()
                     karma_str = f"{karma:+d}" if karma != 0 else "0"
-                    msg += f"{user.display_name:<20} {karma_str:>5}\n"
+                    msg += f"{i}) {user.display_name:<20} {karma_str:>5}\n"
                     i += 1
                 msg += "```"
                 await message.channel.send(msg)
