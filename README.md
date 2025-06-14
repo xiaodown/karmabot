@@ -78,7 +78,7 @@ The bot should now be running and listening for messages in your Discord server.
 - **Check karma:**  
   `@username karma`
 
-- **Leaderboard:**
+- **Leaderboard:**  
   `@KarmaBot top` (to see the users with the highest karma)  
   `@KarmaBot bottom` (to see the users with the lowest karma)
 
