@@ -2,14 +2,16 @@
 
 ###  Files used by the bot ###
 
-# Path to the SQLite database file.  defaults to "db.sqlite3".
+# Path to the SQLite database file.  Defaults to "db.sqlite3".
 # Note that this file will be created if it does not exist.
 # Additionally, the filename "db.sqlite3" is in the .gitignore file;
 # if you change it, be careful not to check it into version control.
 SQLITE_DB = "db.sqlite3"
 
-# Path to the file containing the Discord API key.
+# Path to the file containing the Discord API key. Defaults to "discordapikey.txt".
 # This file should contain only the API key, with no extra whitespace or newlines.
+# Additionally, the filename "discordapikey.txt" is in the .gitignore file;
+# if you change it, be careful not to check it into version control.
 DISCORD_API_KEY_FILE = "discordapikey.txt"
 
 
@@ -19,26 +21,35 @@ DISCORD_API_KEY_FILE = "discordapikey.txt"
 # of users who might otherwise spam karma adjustments.
 
 # Maximum positive karma adjustment allowed in a single message.
+# Defaults to 5
 BUZZKILL_POSITIVE_MAX = 5
 
 # Maximum negative karma adjustment allowed in a single message.
 # NOTE: Discord has a known issue where more than two consecutive
 # minuses will be interpreted as a Markdown horizontal rule.
 # Highly recommend keeping negative buzzkill at 2 to avoid this.
+# Defaults to 2.
 BUZZKILL_NEGATIVE_MAX = 2
 
 
 ### Anti-spam settings ###
 
-# Delay in seconds before a user can adjust karma again.
-# This applies to all users; i.e. if multiple users message @user +++,
-# within this delay, the user's karma will not be updated until the delay has passed.
+# Toggles whether to enforce a delay between karma adjustments.
+# This applies to simultaneous users; i.e. if multiple users send @user +++
+# within this delay, the user's karma will not be updated.
 # This does not apply to one user adjusting multiple users' karma.
+# Defaults to True.
+ENFORCE_KARMA_SPAM_DELAY = True
+# Delay in seconds before a user can adjust karma again.
+# Defaults to 15 seconds.
 KARMA_SPAM_DELAY = 15  # seconds
+
+# Toggles whether to prevent users from adjusting their own karma.
+# Defaults to True.
+PREVENT_SELF_KARMA = True
 
 
 ## Utility functions for loading settings, do not adjust ###
-
 
 def load_api_key(api_key_file_path):
     """Loads your discord API key from a file,

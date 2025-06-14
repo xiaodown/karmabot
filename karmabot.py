@@ -6,7 +6,13 @@ import re
 import discord
 
 from user import User
-from settings import BUZZKILL_POSITIVE_MAX, BUZZKILL_NEGATIVE_MAX, DISCORD_API_KEY
+from settings import (
+    BUZZKILL_NEGATIVE_MAX,
+    BUZZKILL_POSITIVE_MAX,
+    DISCORD_API_KEY,
+    ENFORCE_KARMA_SPAM_DELAY,
+    PREVENT_SELF_KARMA,
+)
 
 intents = discord.Intents.default()
 intents.members = True
@@ -45,23 +51,35 @@ async def on_message(message):
         )
 
         if re.search(karma_query_pattern, message.content, re.IGNORECASE):
+            # The message contains a karma query request
             karma = user.get_karma() if user.get_karma() is not None else 0
             await message.channel.send(f"{user.display_name} has {karma} karma.")
+
         elif match := re.search(karma_adjustment_pattern, message.content):
+            # The message contains a karma adjustment request
+
             # Prevent self-karma
-            if user.id == message.author.id:
-                karma = user.get_karma() if user.get_karma() is not None else 0
-                await message.channel.send(f"{user.display_name} has {karma} karma.")
-                await message.channel.send("_Buzzkill Mode™ has prevented self-karma._")
-                continue
+            if PREVENT_SELF_KARMA:
+                if user.id == message.author.id:
+                    karma = user.get_karma() if user.get_karma() is not None else 0
+                    await message.channel.send(
+                        f"{user.display_name} has {karma} karma."
+                    )
+                    await message.channel.send(
+                        "_Buzzkill Mode™ has prevented self-karma._"
+                    )
+                    continue
 
             # Prevent karma spam
-            if not user.can_update_karma():
-                await message.channel.send(
-                    f"{user.display_name} cannot update karma yet."
-                )
-                await message.channel.send("_Buzzkill Mode™ has prevented karma spam._")
-                continue
+            if ENFORCE_KARMA_SPAM_DELAY:
+                if not user.can_update_karma():
+                    await message.channel.send(
+                        f"{user.display_name} cannot update karma yet."
+                    )
+                    await message.channel.send(
+                        "_Buzzkill Mode™ has prevented karma spam._"
+                    )
+                    continue
 
             symbol_str = match.group(2)
             if all(c == "+" for c in symbol_str):
