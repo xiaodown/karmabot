@@ -50,7 +50,9 @@ async def on_message(message):
                         msg = "🏆 **Top Users:**\n```"
                         i = 1
                         for user in top_users:
-                            msg += f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            msg += (
+                                f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            )
                             i += 1
                         msg += "```"
                         await message.channel.send(msg)
@@ -58,7 +60,9 @@ async def on_message(message):
                         msg = "💀 **Bottom Users:**\n```"
                         i = 1
                         for user in bottom_users:
-                            msg += f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            msg += (
+                                f"{i}) {user.display_name:<20} {user.get_karma():>3}\n"
+                            )
                             i += 1
                         msg += "```"
                         await message.channel.send(msg)
