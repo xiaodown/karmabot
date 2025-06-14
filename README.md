@@ -21,7 +21,7 @@
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/karmabot.git
+    git clone https://github.com/xiaodown/karmabot.git
     cd karmabot
     ```
 
