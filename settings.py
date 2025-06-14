@@ -77,5 +77,4 @@ def load_api_key(api_key_file_path):
     except Exception as e:
         raise OSError(f"An error occurred while loading the API key: {e}") from e
 
-
 DISCORD_API_KEY = load_api_key(DISCORD_API_KEY_FILE)

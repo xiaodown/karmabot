@@ -10,7 +10,15 @@ from settings import LEADERBOARD_SIZE
 
 
 async def get_leaderboard_by_guild(guild: Guild) -> list[User]:
-    """Returns a list of users with the most and least karma."""
+    """Returns a list of users with the most and least karma.
+    
+    Args:
+        guild (discord.Guild): The Discord guild to fetch the leaderboard for.
+    Returns:
+        tuple: A tuple containing two lists:
+            - The top users with the most karma.
+            - The bottom users with the least karma.
+    """
     db = KarmaDatabase()
     user_ids = db.all_user_ids()
     if not user_ids:
