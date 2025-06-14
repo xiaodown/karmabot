@@ -76,7 +76,7 @@ The bot should now be running and listening for messages in your Discord server.
   `@username --` (removes 2 karma from username)
 
 - **Check karma:**  
-  `@username karma`
+  `@username karma` (displays username's current karma score)
 
 - **Leaderboard:**  
   `@KarmaBot top` (to see the users with the highest karma)  
