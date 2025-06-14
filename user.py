@@ -1,5 +1,7 @@
 """User class for Karmabot."""
 
+import discord
+
 from db import KarmaDatabase
 
 
@@ -70,3 +72,24 @@ class User:
             bool: True if the user can update karma, False otherwise.
         """
         return self.db.can_update_karma(self.id)
+
+    @classmethod
+    async def from_id(cls, user_id: int, guild: discord.Guild, db=None):
+        """
+        Create a User object from a Discord user ID and guild.
+
+        Args:
+            user_id (int): The Discord user ID.
+            guild (discord.Guild): The guild to search for the user.
+            db: Optional KarmaDatabase instance.
+
+        Returns:
+            User: The corresponding User object, or None if not found.
+        """
+        member = guild.get_member(user_id)
+        if member is None:
+            try:
+                member = await guild.fetch_member(user_id)
+            except discord.NotFound:
+                return None
+        return cls(member, db)

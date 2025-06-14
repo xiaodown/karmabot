@@ -48,8 +48,21 @@ KARMA_SPAM_DELAY = 15  # seconds
 # Defaults to True.
 PREVENT_SELF_KARMA = True
 
+### Leaderboard settings ###
+
+# Toggles whether to enable the leaderboard command.
+# Defaults to True.
+ENABLE_LEADERBOARD = True
+
+# Number of users to show in the leaderboard.
+# Accepted values are integers 1 through 100.
+# Will be capped at the number of users for a given server, if that is less than LEADERBOARD_SIZE.
+# Defaults to 5.
+LEADERBOARD_SIZE = 5
+
 
 ## Utility functions for loading settings, do not adjust ###
+
 
 def load_api_key(api_key_file_path):
     """Loads your discord API key from a file,

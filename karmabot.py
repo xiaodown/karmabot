@@ -6,10 +6,12 @@ import re
 import discord
 
 from user import User
+from leaderboard import get_leaderboard_by_guild
 from settings import (
     BUZZKILL_NEGATIVE_MAX,
     BUZZKILL_POSITIVE_MAX,
     DISCORD_API_KEY,
+    ENABLE_LEADERBOARD,
     ENFORCE_KARMA_SPAM_DELAY,
     PREVENT_SELF_KARMA,
 )
@@ -36,6 +38,24 @@ async def on_message(message):
 
     for mentioned_user in message.mentions:
         user = User(mentioned_user)
+
+        if mentioned_user == bot.user:
+            if "top" in message.content.lower() or "bottom" in message.content.lower():
+                if ENABLE_LEADERBOARD:
+                    await message.channel.send("Fetching leaderboard, please wait...")
+                    top_users, bottom_users = await get_leaderboard_by_guild(
+                        message.guild
+                    )
+                    if "top" in message.content.lower():
+                        msg = "🏆 **Top Users:**\n"
+                        for user in top_users:
+                            msg += f"{user.display_name} — {user.get_karma()}\n"
+                        await message.channel.send(msg)
+                    if "bottom" in message.content.lower():
+                        msg = "💀 **Bottom Users:**\n"
+                        for user in bottom_users:
+                            msg += f"{user.display_name} — {user.get_karma()}\n"
+                        await message.channel.send(msg)
 
         mention_str = f"<@{user.id}>"
         # Discord also supports <@!id> for nicknames

@@ -120,3 +120,25 @@ class KarmaDatabase:
             if row and time.time() - row[0] < KARMA_SPAM_DELAY:
                 return False
             return True
+
+    def all_user_ids_and_karma(self) -> list[tuple[int, int]]:
+        """
+        Retrieve all users and their karma values from the database.
+
+        Returns:
+            list[tuple[int, int]]: A list of tuples containing user IDs and their karma values.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute("SELECT user_id, karma FROM karma")
+            return cur.fetchall()
+
+    def all_user_ids(self) -> list[int]:
+        """
+        Retrieve a list of all user IDs in the karma table.
+
+        Returns:
+            list[int]: A list of Discord user IDs.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute("SELECT user_id FROM karma")
+            return [row[0] for row in cur.fetchall()]
