@@ -8,7 +8,16 @@ from db import KarmaDatabase
 class User:
     """Represents a user and provides methods to interact with the karma database."""
 
-    def __init__(self, discord_user, db=None):
+    def __init__(
+        self,
+        discord_user=None,
+        db=None,
+        *,
+        user_id: int | None = None,
+        name: str | None = None,
+        display_name: str | None = None,
+        karma: int | None = None,
+    ):
         """
         Initialize a User object.
 
@@ -16,10 +25,23 @@ class User:
             discord_user: A discord.Member or discord.User object.
             db: Optional KarmaDatabase instance. If None, a new one is created.
         """
-        self.id = discord_user.id
-        self.name = discord_user.name
-        self.display_name = discord_user.display_name
         self.db = db if db is not None else KarmaDatabase()
+        self._karma = karma
+
+        if discord_user is not None:
+            self.id = discord_user.id
+            self.name = discord_user.name
+            self.display_name = discord_user.display_name
+            return
+
+        if user_id is None or name is None or display_name is None:
+            raise ValueError(
+                "User requires either a Discord user or explicit user_id/name/display_name."
+            )
+
+        self.id = user_id
+        self.name = name
+        self.display_name = display_name
 
     def exists(self) -> bool:
         """
@@ -40,6 +62,8 @@ class User:
         if not self.exists():
             self.db.create(self.id)
         self.db.update(self.id, delta)
+        if self._karma is not None:
+            self._karma += delta
 
     def get_karma(self) -> int | None:
         """
@@ -48,6 +72,8 @@ class User:
         Returns:
             int or None: The user's karma, or None if not found.
         """
+        if self._karma is not None:
+            return self._karma
         return self.db.get_karma(self.id)
 
     @classmethod
@@ -93,3 +119,25 @@ class User:
             except discord.NotFound:
                 return None
         return cls(member, db)
+
+    @classmethod
+    def from_registry_row(cls, row, db=None):
+        """
+        Create a User object from a local registry/leaderboard query row.
+
+        Args:
+            row: A sqlite row containing user_id, karma, user_name, and nickname.
+            db: Optional KarmaDatabase instance.
+
+        Returns:
+            User: A lightweight user populated from cached local data.
+        """
+        user_name = row["user_name"] or f"user-{row['user_id']}"
+        display_name = row["nickname"] or user_name
+        return cls(
+            db=db,
+            user_id=row["user_id"],
+            name=user_name,
+            display_name=display_name,
+            karma=row["karma"],
+        )

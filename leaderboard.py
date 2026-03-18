@@ -1,7 +1,5 @@
 """A leaderboard for finding out who has the best and worst karma in a server."""
 
-import asyncio
-
 from discord import Guild
 
 from db import KarmaDatabase
@@ -9,7 +7,7 @@ from user import User
 from settings import LEADERBOARD_SIZE
 
 
-async def get_leaderboard_by_guild(guild: Guild) -> list[User]:
+async def get_leaderboard_by_guild(guild: Guild) -> tuple[list[User], list[User]]:
     """Returns a list of users with the most and least karma.
     
     Args:
@@ -20,21 +18,18 @@ async def get_leaderboard_by_guild(guild: Guild) -> list[User]:
             - The bottom users with the least karma.
     """
     db = KarmaDatabase()
-    user_ids = db.all_user_ids()
-    if not user_ids:
-        return []
+    user_count = db.karma_user_count()
+    if not user_count:
+        return [], []
 
-    # Convert user ids to User objects
-    users = await asyncio.gather(
-        *[User.from_id(user_id, guild) for user_id in user_ids]
-    )
-    users = [user for user in users if user is not None]
-
-    size = max(1, min(LEADERBOARD_SIZE, 100, len(users)))
-
-    top_users = sorted(users, key=lambda user: user.get_karma() or 0, reverse=True)[
-        :size
+    size = max(1, min(LEADERBOARD_SIZE, 100, user_count))
+    top_users = [
+        User.from_registry_row(row, db)
+        for row in db.get_top_karma_entries(guild.id, size)
     ]
-    bottom_users = sorted(users, key=lambda user: user.get_karma() or 0)[:size]
+    bottom_users = [
+        User.from_registry_row(row, db)
+        for row in db.get_bottom_karma_entries(guild.id, size)
+    ]
 
     return top_users, bottom_users

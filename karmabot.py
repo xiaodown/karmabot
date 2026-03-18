@@ -5,6 +5,7 @@ import re
 
 import discord
 
+from db import KarmaDatabase
 from user import User
 from leaderboard import get_leaderboard_by_guild
 from settings import (
@@ -20,12 +21,34 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = discord.Client(intents=intents)
+db = KarmaDatabase()
 
 
 @bot.event
 async def on_ready():
     """Event handler for when the bot is ready."""
+    for guild in bot.guilds:
+        db.record_guild(guild)
     print(f"Logged in as {bot.user.name} ({bot.user.id})")
+
+
+@bot.event
+async def on_member_join(member):
+    """Refresh registry membership data when a user joins a guild."""
+    db.record_member(member)
+
+
+@bot.event
+async def on_member_remove(member):
+    """Refresh registry membership data when a user leaves a guild."""
+    db.record_departed_member(member)
+
+
+@bot.event
+async def on_member_update(before, after):
+    """Refresh registry membership data when a member's profile changes."""
+    if before.nick != after.nick or before.display_name != after.display_name:
+        db.record_member(after)
 
 
 async def bot_commands(message):
@@ -165,6 +188,9 @@ async def on_message(message):
     """Event handler for incoming messages."""
     if message.author.bot:
         return
+
+    db.record_message(message)
+
     if not message.mentions:
         return
 
@@ -172,8 +198,9 @@ async def on_message(message):
 
         if mentioned_user == bot.user:
             await bot_commands(message)
+            continue
 
-        user = User(mentioned_user)
+        user = User(mentioned_user, db)
         await karma_commands(user, message)
 
 
