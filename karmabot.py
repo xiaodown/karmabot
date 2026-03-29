@@ -1,6 +1,7 @@
 """A Discord bot that tracks user karma in a sqlite database.
 Users can give and receive karma points by using commands."""
 
+import logging
 import re
 
 import discord
@@ -205,6 +206,16 @@ async def on_message(message):
 
 
 if __name__ == "__main__":
+    # WebSocket close code 1000 is a normal/graceful closure by Discord's servers
+    # (e.g. during rolling restarts). discord.py reconnects automatically, so
+    # logging these at ERROR level is just noise. Filter them out.
+    class _IgnoreWsClose1000(logging.Filter):
+        def filter(self, record):
+            msg = record.getMessage()
+            return not ("ConnectionClosed" in msg and "1000" in msg)
+
+    logging.getLogger("discord.client").addFilter(_IgnoreWsClose1000())
+
     try:
         bot.run(DISCORD_API_KEY)
     except discord.LoginFailure as e:
