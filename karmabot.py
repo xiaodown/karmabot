@@ -52,6 +52,63 @@ async def on_member_update(before, after):
         db.record_member(after)
 
 
+# Discord's maximum message length in characters.
+DISCORD_MESSAGE_LIMIT = 2000
+
+# Word-boundary patterns so words like "stop" or "laptop" don't trigger "top".
+HELP_PATTERN = re.compile(r"\bhelp\b")
+TOP_PATTERN = re.compile(r"\btop\b")
+BOTTOM_PATTERN = re.compile(r"\bbottom\b")
+
+
+def _leaderboard_rows(users):
+    """Format ranked users into leaderboard table rows."""
+    rows = []
+    for i, user in enumerate(users, start=1):
+        karma = user.get_karma()
+        karma_str = f"{karma:+d}" if karma != 0 else "0"
+        rows.append(f"{i}) {user.display_name:<20} {karma_str:>5}")
+    return rows
+
+
+def _chunk_leaderboard(title: str, rows: list[str]) -> list[str]:
+    """Split leaderboard rows into messages, each under Discord's limit.
+
+    Each message is shaped like:
+
+        <header>
+        ```
+        row
+        row
+        ```
+
+    A single row that is itself longer than the limit is still sent on its
+    own; Discord will reject it, but that cannot happen with real names.
+    """
+    if not rows:
+        return [f"{title}\n_No users found._"]
+
+    messages = []
+    header = title
+    block_rows: list[str] = []
+    # Fixed per-message overhead: "\n```" after the header and the closing
+    # "\n```". Each row additionally costs len(row) + 1 (trailing newline).
+    block_size = len(header) + 8
+
+    for row in rows:
+        row_size = len(row) + 1
+        if block_rows and block_size + row_size > DISCORD_MESSAGE_LIMIT:
+            messages.append(f"{header}\n```\n" + "\n".join(block_rows) + "\n```")
+            header = f"{title} (continued)"
+            block_rows = []
+            block_size = len(header) + 8
+        block_rows.append(row)
+        block_size += row_size
+
+    messages.append(f"{header}\n```\n" + "\n".join(block_rows) + "\n```")
+    return messages
+
+
 async def bot_commands(message):
     """Handles bot commands.\n\n
 
@@ -62,7 +119,8 @@ async def bot_commands(message):
     """
 
     # Help requests
-    if "help" in message.content.lower() or "?" in message.content.lower():
+    content = message.content.lower()
+    if HELP_PATTERN.search(content) or "?" in content:
         bot_member = message.guild.me
         help_message = (
             "Karma Bot Commands:\n"
@@ -78,30 +136,24 @@ async def bot_commands(message):
         await message.channel.send(help_message)
 
     # Leaderboard requests
-    if "top" in message.content.lower() or "bottom" in message.content.lower():
+    wants_top = TOP_PATTERN.search(content)
+    wants_bottom = BOTTOM_PATTERN.search(content)
+    if wants_top or wants_bottom:
         if ENABLE_LEADERBOARD:
             await message.channel.send("Fetching leaderboard, please wait...")
-            top_users, bottom_users = await get_leaderboard_by_guild(message.guild)
-            if "top" in message.content.lower():
-                msg = "🏆 **Top Users:**\n```"
-                i = 1
-                for user in top_users:
-                    karma = user.get_karma()
-                    karma_str = f"{karma:+d}" if karma != 0 else "0"
-                    msg += f"{i}) {user.display_name:<20} {karma_str:>5}\n"
-                    i += 1
-                msg += "```"
-                await message.channel.send(msg)
-            if "bottom" in message.content.lower():
-                msg = "💀 **Bottom Users:**\n```"
-                i = 1
-                for user in bottom_users:
-                    karma = user.get_karma()
-                    karma_str = f"{karma:+d}" if karma != 0 else "0"
-                    msg += f"{i}) {user.display_name:<20} {karma_str:>5}\n"
-                    i += 1
-                msg += "```"
-                await message.channel.send(msg)
+            top_users, bottom_users = await get_leaderboard_by_guild(
+                message.guild, db
+            )
+            if wants_top:
+                for chunk in _chunk_leaderboard(
+                    "🏆 **Top Users:**", _leaderboard_rows(top_users)
+                ):
+                    await message.channel.send(chunk)
+            if wants_bottom:
+                for chunk in _chunk_leaderboard(
+                    "💀 **Bottom Users:**", _leaderboard_rows(bottom_users)
+                ):
+                    await message.channel.send(chunk)
 
 
 async def karma_commands(user: User, message: discord.Message):

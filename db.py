@@ -26,12 +26,20 @@ class KarmaDatabase:
             db_path (str): Path to the SQLite database file.
         """
         self.db_path = db_path
+        self._conn = self._create_conn()
         self._initialize_db()
 
-    def _get_conn(self) -> sqlite3.Connection:
-        """Return a sqlite connection configured for this app."""
+    def _create_conn(self) -> sqlite3.Connection:
+        """Open the persistent SQLite connection for this app.
+
+        WAL mode plus synchronous=NORMAL keeps per-commit cost low while
+        staying crash-safe (a power loss can at most lose the last
+        transaction, and the database is never corrupted by a crash).
+        """
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return conn
 
@@ -39,7 +47,7 @@ class KarmaDatabase:
         """
         Create or migrate the database schema.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS karma (
@@ -107,7 +115,7 @@ class KarmaDatabase:
             user_id (int): The Discord user ID to add.
             karma (int, optional): The initial karma value. Defaults to 0.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 "INSERT OR IGNORE INTO karma (user_id, karma) VALUES (?, ?)",
                 (user_id, karma),
@@ -123,7 +131,7 @@ class KarmaDatabase:
         Returns:
             int or None: The user's karma value, or None if the user does not exist.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute("SELECT karma FROM karma WHERE user_id = ?", (user_id,))
             row = cur.fetchone()
             return row[0] if row else None
@@ -138,7 +146,7 @@ class KarmaDatabase:
             delta (int): The amount to add (or subtract) from the user's karma.
         """
         now = int(time.time())
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 "UPDATE karma SET karma = karma + ?, last_karma = ? WHERE user_id = ?",
                 (delta, now, user_id),
@@ -151,7 +159,7 @@ class KarmaDatabase:
         Args:
             user_id (int): The Discord user ID to delete.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute("DELETE FROM karma WHERE user_id = ?", (user_id,))
 
     def can_update_karma(self, user_id: int) -> bool:
@@ -168,7 +176,7 @@ class KarmaDatabase:
         Returns:
             bool: True if the user can receive a karma update, False otherwise.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute(
                 "SELECT last_karma FROM karma WHERE user_id = ?", (user_id,)
             )
@@ -184,7 +192,7 @@ class KarmaDatabase:
         Returns:
             list[tuple[int, int]]: A list of tuples containing user IDs and their karma values.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute("SELECT user_id, karma FROM karma")
             return cur.fetchall()
 
@@ -195,19 +203,19 @@ class KarmaDatabase:
         Returns:
             list[int]: A list of Discord user IDs.
         """
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute("SELECT user_id FROM karma")
             return [row[0] for row in cur.fetchall()]
 
     def karma_user_count(self) -> int:
         """Return the number of karma-tracked users."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute("SELECT COUNT(*) FROM karma")
             return cur.fetchone()[0]
 
     def upsert_guild(self, guild_id: int, guild_name: str) -> None:
         """Insert or update a guild in the local registry."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 """
                 INSERT INTO guilds (guild_id, guild_name)
@@ -219,7 +227,7 @@ class KarmaDatabase:
 
     def upsert_user(self, user_id: int, user_name: str) -> None:
         """Insert or update a user in the local registry."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 """
                 INSERT INTO users (user_id, user_name)
@@ -237,7 +245,7 @@ class KarmaDatabase:
         is_member: int | None,
     ) -> None:
         """Insert or update a user's guild-specific name and membership state."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             conn.execute(
                 """
                 INSERT INTO user_nicknames (user_id, guild_id, nickname, is_member)
@@ -304,7 +312,7 @@ class KarmaDatabase:
     ) -> list[sqlite3.Row]:
         """Return ranked karma rows, attaching cached names after ranking."""
         order = "DESC" if descending else "ASC"
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute(
                 f"""
                 SELECT ranked.user_id, ranked.karma, users.user_name, ranked.nickname
@@ -327,13 +335,13 @@ class KarmaDatabase:
 
     def all_guild_ids(self) -> list[int]:
         """Return all guild IDs in the local registry."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             cur = conn.execute("SELECT guild_id FROM guilds ORDER BY guild_id")
             return [row[0] for row in cur.fetchall()]
 
     def needs_registry_backfill(self, user_id: int, guild_id: int) -> bool:
         """Return True when we are missing user or guild-specific name data."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             user_row = conn.execute(
                 "SELECT 1 FROM users WHERE user_id = ?",
                 (user_id,),
@@ -354,7 +362,7 @@ class KarmaDatabase:
 
     def has_user_registry_entry(self, user_id: int) -> bool:
         """Return True if the user exists in the local registry."""
-        with self._get_conn() as conn:
+        with self._conn as conn:
             row = conn.execute(
                 "SELECT 1 FROM users WHERE user_id = ?",
                 (user_id,),
