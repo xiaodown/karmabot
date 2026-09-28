@@ -1,8 +1,13 @@
 # DO NOT check your discord API key into version control!
 discordapikey.txt
 
+# Also keep the flybot plan (private project notes) out of git.
+FLYBOT_PLAN.md
+
 # ALSO DO NOT check your sqlite database into version control, though it's probably not as bad.
 db.sqlite3
+db.sqlite3-wal
+db.sqlite3-shm
 
 
 #### Below is a standard Python .gitignore file ####
