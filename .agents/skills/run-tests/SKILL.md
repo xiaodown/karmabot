@@ -24,8 +24,9 @@ The runner (repo root `run_tests.py`):
 - Prefers `.venv/bin/python` if the project virtualenv exists, else the
   current interpreter.
 - Prefers pytest if the chosen interpreter has it, else falls back to the
-  stdlib `unittest` discover runner. The suite is written in `unittest` so
-  it runs either way.
+  stdlib `unittest` discover runner. `pytest` is a declared dependency in
+  `requirements.txt`, so a normal install uses pytest; the unittest
+  fallback keeps the suite runnable in a bare interpreter.
 - Sets `PYTHONPATH` to the repo root and runs from the repo root, so tests
   import `db`, `karmabot`, etc. without packaging.
 - Exits nonzero on failure (CI-friendly).
@@ -65,5 +66,5 @@ Conventions:
 
 - Do not run the actual bot (`python3 karmabot.py`) to "test" it; it
   connects to the live Discord gateway.
-- Do not add pytest as a hard dependency; the stdlib fallback must keep
-  working.
+- Do not remove the stdlib `unittest` fallback from `run_tests.py`; the
+  suite must keep running in an interpreter without pytest.
